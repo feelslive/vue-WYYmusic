@@ -8,7 +8,7 @@
 	export default {
 		data(){
 			return {
-				artists:"暂时没找到对应接口"
+				artists:"暂未开发"
 			}
 		},
 		created(){

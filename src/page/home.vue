@@ -90,6 +90,7 @@
 			text-indent: .5rem;
 			vertical-align:top;
 			border-radius:1.5rem;
+			font-size: .8rem;
 		}
 	}	
 }

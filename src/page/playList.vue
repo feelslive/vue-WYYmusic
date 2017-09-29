@@ -2,7 +2,7 @@
 	<div class="playlist">
 		<div class="pl-tit" :style="{'background': 'rgba(206, 61, 62, '+ opacity +')'}" style="transition: opacity .1s;">
 			<div class="pl-tit-left" @click="back()">
-				<span>←</span>
+				<span></span>
 			</div>
 			<div class="pl-tit-text">
 				<span>{{fname}}</span>
@@ -82,7 +82,7 @@
   		},
   		mounted(){
   			 window.onscroll = () => {
-	        	console.log("滚动了")
+	        	// console.log("滚动了")
 		        var opa = window.pageYOffset / 150
 		        if (opa > 0.5) {
 		          this.fname = this.sname
@@ -91,12 +91,6 @@
 		        }
 		        this.opacity = window.pageYOffset / 150
 		    }
-		    window.addEventListener('scroll',function(){ 
-		    	var scrollTop = document.documentElement.scrollTop || document.body.scrollTop; 
-		    	if(scrollTop>300){ //判断当滚到高度大于300时候 
-		    		console.log('300'); //这里写要触发的事件 
-				} 
-			},true)
   		},
   		methods:{
   			back () {
@@ -140,6 +134,8 @@
 	position: fixed;
 	display: flex;
 	.pl-tit-left {
+		background: url(../../static/img/return.png) no-repeat center;
+    	background-size: 1.2rem;
 		flex:1;
 	}
 	.pl-tit-text {

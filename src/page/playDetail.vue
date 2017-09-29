@@ -7,7 +7,7 @@
 					<div class="mu-appbar">
 						<!-- 上一步 -->
 						<div class="left" @click="back()">
-							<span>←</span>
+							<span></span>
 						</div>
 						<!-- 歌名 -->
 						<div class="mu-appbar-title">
@@ -20,18 +20,18 @@
 						</div>
 						<!-- 分享 -->
 						<div class="right">
-							<span>&</span>
+							<span></span>
 						</div>
 					</div>
 					<div class="bar-line"></div>
 					<div class="mu-flexbox main mu-flex-col">
-						<audio :src="items.url" autoplay="autoplay"></audio>
+						<audio :src="items.url" autoplay="autoplay" id="audio" loop="loop" ref='audio'></audio>
 						<div class="mu-flexbox-item" style="flex: 1 1 auto; order: 0;">
 							<div class="cd-holder">
-								<div class="stick cd-play">
+								<div class="stick" :class="{cdplay:!playing}">
 									
 								</div>
-								<div class="cd-wrapper cd-rotate">
+								<div class="cd-wrapper" :class="{cdrotate:!playing}">
 									<div class="cd-mask"></div>
 									<img :src="itemal.picUrl" alt="">
 								</div>
@@ -53,12 +53,7 @@
 							<div class="process-bar">
 								<div class="pro">
 									<div class="pro-wrap">
-										<div class="mu-slider song-slider">
-											<input type="hidden" value=''>
-											<div class="mu-slider-track"></div>
-											<div class="mu-slider-fill"></div>
-											<div class="mu-slider-thumb"></div>
-										</div>
+										<mu-slider class="song-slider" v-model="Timedd" @change="changeTime"/>
 									</div>
 									<div class="time">
 										<time id="cur">{{currentTime | time}}</time>
@@ -68,7 +63,13 @@
 							</div>
 							<!-- 控制按钮 -->
 							<div class="control-bar">
-								
+								<div class="action">
+									<span @click='ckload'></span> 
+									<span></span> 
+									<span class="noplay" :class="{pause: playing}" @click="tooglplay"></span>
+									<span></span> 
+									<span></span>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -97,8 +98,10 @@
 				lyric: '',
 				afterLrc:[],
 				lrcIndex:0,
-				currentTime:'0',//开始时间
-				durationTime:'240',//总共时间
+				currentTime:0,//开始时间
+				durationTime:0,//总共时间
+				Timedd:0,
+				playing:false,//暂停播放
 				id:this.$route.params.id
 			}
 		},
@@ -130,6 +133,13 @@
 				},function(error){
 				console.log(error);
 			})
+
+			
+			setTimeout(()=>{
+				this.alltime()
+			},1000)
+			
+			
   		},
   		computed:{
   			lrcOffset () {
@@ -137,16 +147,53 @@
 		        // 1、根据时间获得歌词
 		        var current = Math.round(this.currentTime)
 		        // 2、根据时间得到歌词
+		        
 		        for (var i = 0; i < this.afterLrc.length; i++) {
-		          if (this.afterLrc[i].time === current) this.lrcIndex = i
+		        	//console.log(current+"shi")
+		          if (this.afterLrc[i].time == current){
+		          	this.lrcIndex = i
+		          } 
 		        }
-		        return -(this.lrcIndex) * 58
+		        return -(this.lrcIndex) * 42
 		      }
 		    }
+  		},
+  		mounted(){
+				
   		},
 		methods:{
 			back () {
 				this.$router.go(-1)
+			},
+			tooglplay(){
+				this.playing=!this.playing
+				if(this.playing){
+					this.isrotate = false
+					document.querySelector("#audio").pause()
+				}else{
+					this.isrotate = true
+					document.querySelector("#audio").play()
+				}
+			},
+			ckload(){
+				document.querySelector("#audio").load()
+			},
+			changeTime(){
+
+			},
+			alltime(){
+				var _this = this
+				var audio = document.querySelector("#audio");
+				//console.log(audio)
+
+				var au = this.$refs.audio;
+				this.durationTime = au.duration
+				setInterval(()=>{
+					this.currentTime = au.currentTime
+					this.durationTime = au.duration
+					this.Timedd = this.currentTime/this.durationTime*100
+				},1000);
+				// _this.currentTime = audio.currentTime
 			},
 			getLrc () {
 		      if (this.lyric) {
@@ -210,6 +257,8 @@
     	.left {
     		height: 100%;
     		width:2.06rem;
+    		background: url(../../static/img/return.png) no-repeat center;
+    		background-size: 1.2rem;
     		span{
     			margin-left: 1rem;
     			text-align: center;
@@ -218,6 +267,8 @@
     	.right {
     		height: 100%;
     		width:2.06rem;
+    		background: url(../../static/img/share.png) no-repeat center;
+    		background-size: 1.2rem;
     		span{
     			margin-left: 1rem;
     			text-align: center;
@@ -271,13 +322,13 @@
 			    -ms-transform: rotate(-20deg);
 			    transform: rotate(-20deg);
     		}
-    		.cd-play {
+    		.cdplay {
 	    		background-position-y: -0.7rem;
 			    -webkit-transform: rotate(0deg);
 			    -ms-transform: rotate(0deg);
 			    transform: rotate(0deg);
     		}
-    		.cd-rotate{
+    		.cdrotate{
     			-webkit-animation: rotating 10s linear .3s infinite;
     			animation: rotating 10s linear .3s infinite;
     		}
@@ -316,7 +367,7 @@
     			margin-top: .6rem;
 			    position: relative;
 			    overflow: hidden;
-			    height: 3.5rem;
+			    height: 3.7rem;
 			   	.lrc-inner{
 			   		position: absolute;
 				    left: 10px;
@@ -330,6 +381,7 @@
 				    font-size: 16px;
 				    color: #fff;
 				    text-align: center;
+				    line-height: 42px;
 					}
 			   	} 
     		}
@@ -340,6 +392,13 @@
     					margin: 0 2rem;
 					    padding: 1rem 0 0;
 					    position: relative;
+					    .mu-slider {
+					    	.mu-slider-thumb {
+						    	color: red!important;
+						    	background-color:red!important;
+					    	}
+					    }
+					    
     				}
     				.time {
     					color: #fff;
@@ -356,6 +415,42 @@
 						    opacity: .5;
     					}
     				}
+    			}
+    		}
+    		.control-bar {
+    			.action {
+    				display: flex;
+    				span {
+    					flex: 1;
+					    display: inline-block;
+					    height: 60px;
+					    background-repeat: no-repeat;
+					    background-position: 50%;
+    				}
+    				span:first-child {
+    					background: url(../../static/img/seq.png);
+    					background-size: 60px 60px;
+    				}
+    				span:nth-child(2) {
+    					background: url(../../static/img/prev.png);
+    					background-size: 60px 60px;
+    				}
+    				span.noplay{
+    					background: url(../../static/img/pause.png);
+    					background-size: 60px 60px;
+    				}
+    				span:nth-child(4) {
+    					background: url(../../static/img/next.png);
+    					background-size: 60px 60px;
+    				}
+    				span:nth-child(5){
+    					background: url(../../static/img/list.png);
+    					background-size: 60px 60px;
+    				}
+    				.pause {
+					    background: url("../../static/img/play.png") no-repeat!important;
+					    background-size: 60px 60px!important;
+					}
     			}
     		}
     		
